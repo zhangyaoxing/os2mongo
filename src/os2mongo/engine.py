@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import importlib.util
+import logging
+import time
 from typing import Any
 
 from .config import Settings
 from .mongodb import MongoWriter
 from .opensearch import OpenSearchClient
+
+logger = logging.getLogger(__name__)
 
 
 class MigrationEngine:
@@ -74,6 +78,7 @@ class MigrationEngine:
             self._mongo.drop_collection(target)
 
         total = self._os.get_index_count(source_index, query=query)
+        logger.info("Index '%s' has %d matching documents", source_index, total)
         if total == 0:
             return {"total": 0, "inserted": 0, "errors": 0}
 
@@ -81,6 +86,8 @@ class MigrationEngine:
         errors = 0
         batch: list[dict[str, Any]] = []
         collection = self._mongo.get_collection(target)
+        start_time = time.monotonic()
+        last_report = start_time
 
         for doc in self._os.scan_documents(source_index, query=query):
             if self._transforms:
@@ -96,7 +103,24 @@ class MigrationEngine:
                 inserted += self._mongo.bulk_insert(collection, batch)
                 batch = []
 
+                now = time.monotonic()
+                if now - last_report >= self._settings.report_interval:
+                    elapsed = now - start_time
+                    rate = inserted / elapsed if elapsed > 0 else 0
+                    logger.info(
+                        "Migrated %d/%d docs (%.0f docs/s, %d errors)",
+                        inserted, total, rate, errors,
+                    )
+                    last_report = now
+
         if batch:
             inserted += self._mongo.bulk_insert(collection, batch)
+
+        elapsed = time.monotonic() - start_time
+        rate = inserted / elapsed if elapsed > 0 else 0
+        logger.info(
+            "Migration finished: %d/%d docs in %.1fs (%.0f docs/s, %d errors)",
+            inserted, total, elapsed, rate, errors,
+        )
 
         return {"total": total, "inserted": inserted, "errors": errors}

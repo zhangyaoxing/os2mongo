@@ -26,6 +26,7 @@ All settings are loaded from environment variables with the `OS2MONGO_` prefix, 
 | `OS2MONGO_MONGODB_DATABASE`        | `os2mongo`                  | Target database name                                   |
 | `OS2MONGO_BATCH_SIZE`              | `1000`                      | Documents per bulk insert batch                        |
 | `OS2MONGO_SCROLL_TIME`             | `5m`                        | OpenSearch scroll keep-alive                           |
+| `OS2MONGO_REPORT_INTERVAL`         | `10`                        | Progress logging interval in seconds                   |
 | `OS2MONGO_DROP_EXISTING`           | `false`                     | Drop target collection before migration                |
 | `OS2MONGO_QUERY`                   | —                           | Default query in OpenSearch DSL (overridden by `-q`)   |
 | `OS2MONGO_TRANSFORM_SCRIPT`        | —                           | Path to a single Python transform script               |

@@ -1,12 +1,19 @@
 from __future__ import annotations
 
 import json
+import logging
 import sys
 
 import click
 
 from .config import Settings
 from .engine import MigrationEngine
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s  %(levelname)-7s  %(message)s",
+    datefmt="%H:%M:%S",
+)
 
 
 @click.group()

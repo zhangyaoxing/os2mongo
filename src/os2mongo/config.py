@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     # Migration
     batch_size: int = 1000
     scroll_time: str = "5m"
+    report_interval: float = 10.0
     transform_script: Path | None = None
     transform_dir: Path | None = Path("transformers")
     drop_existing: bool = False
