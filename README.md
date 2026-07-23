@@ -26,6 +26,8 @@ All settings are loaded from environment variables with the `OS2MONGO_` prefix, 
 | `OS2MONGO_SCROLL_TIME`             | `5m`                        | OpenSearch scroll keep-alive                         |
 | `OS2MONGO_DROP_EXISTING`           | `false`                     | Drop target collection before migration              |
 | `OS2MONGO_QUERY`                   | —                           | Default query in OpenSearch DSL (overridden by `-q`) |
+| `OS2MONGO_TRANSFORM_SCRIPT`        | —                           | Path to a single Python transform script              |
+| `OS2MONGO_TRANSFORM_DIR`           | `transformers`              | Directory of transform scripts (loaded alphabetically) |
 
 ## Usage
 
@@ -51,6 +53,7 @@ Migrate all documents from the `my-index` OpenSearch index to a `my-index` Mongo
 | `-q, --query`             | JSON query in OpenSearch DSL to filter documents               |
 | `--drop-existing`         | Drop the target collection before migrating                    |
 | `--transform`             | Path to a Python transform script                              |
+| `--transform-dir`         | Directory of Python transform scripts (loaded alphabetically)   |
 
 ### Examples
 
@@ -80,6 +83,15 @@ def transform(doc):
     doc["migrated_at"] = "2026-07-23"
     return doc
 ```
+
+Use a directory of transform scripts (loaded in alphabetical order):
+
+```bash
+os2mongo migrate my-index --transform-dir transformers
+```
+
+The default value of `--transform-dir` is `transformers`, so scripts in that directory are
+loaded automatically — no CLI flag or `.env` setting needed.
 
 Filter by date range:
 

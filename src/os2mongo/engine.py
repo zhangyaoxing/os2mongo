@@ -15,21 +15,42 @@ class MigrationEngine:
         self._settings = settings
         self._os = OpenSearchClient(settings)
         self._mongo = MongoWriter(settings)
-        self._transform: Any = None  # Callable[[dict[str, Any]], dict[str, Any]]
+        self._transforms: list[Any] = []
 
-        if settings.transform_script:
-            self._transform = self._load_transform(settings.transform_script)
+        self._load_transforms()
 
     @staticmethod
-    def _load_transform(path: str):  # -> Callable[[dict[str, Any]], dict[str, Any]]
+    def _load_module_transform(path: str):  # -> Callable[[dict], dict]
         spec = importlib.util.spec_from_file_location("transform", path)
         if spec is None or spec.loader is None:
             raise ImportError(f"Cannot load transform script: {path}")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         if not hasattr(module, "transform"):
-            raise AttributeError(f"Transform script must define a 'transform' function: {path}")
+            raise AttributeError(
+                f"Transform script must define a 'transform' function: {path}"
+            )
         return module.transform
+
+    def _load_transforms(self) -> None:
+        """Load all transform functions from --transform and --transform-dir."""
+        if self._settings.transform_script:
+            self._transforms.append(
+                self._load_module_transform(str(self._settings.transform_script))
+            )
+
+        if self._settings.transform_dir:
+            dir_path = self._settings.transform_dir
+            if dir_path.is_dir():
+                for py_file in sorted(dir_path.glob("*.py")):
+                    self._transforms.append(
+                        self._load_module_transform(str(py_file))
+                    )
+
+    def _apply_transforms(self, doc: dict[str, Any]) -> dict[str, Any]:
+        for t in self._transforms:
+            doc = t(doc)
+        return doc
 
     def check_connections(self) -> dict[str, bool]:
         return {
@@ -62,9 +83,9 @@ class MigrationEngine:
         collection = self._mongo.get_collection(target)
 
         for doc in self._os.scan_documents(source_index, query=query):
-            if self._transform:
+            if self._transforms:
                 try:
-                    doc = self._transform(doc)
+                    doc = self._apply_transforms(doc)
                 except Exception:
                     errors += 1
                     continue

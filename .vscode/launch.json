@@ -27,9 +27,7 @@
                 "migrate",
                 "gand_1",
                 "-t",
-                "gand_1",
-                "--transform",
-                "transformers/standard.py"
+                "gand_1"
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",

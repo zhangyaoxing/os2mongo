@@ -41,12 +41,19 @@ def main() -> None:
     type=click.Path(exists=True),
     help="Path to a Python transform script.",
 )
+@click.option(
+    "--transform-dir",
+    default=None,
+    type=click.Path(exists=True, file_okay=False),
+    help="Directory of Python transform scripts (loaded in alphabetical order).",
+)
 def migrate(
     source_index: str,
     target_collection: str | None,
     query: str | None,
     drop_existing: bool | None,
     transform: str | None,
+    transform_dir: str | None,
 ) -> None:
     """Migrate documents from an OpenSearch index to a MongoDB collection."""
     settings = Settings()
@@ -54,6 +61,8 @@ def migrate(
         settings.drop_existing = drop_existing
     if transform:
         settings.transform_script = transform  # type: ignore[assignment]
+    if transform_dir:
+        settings.transform_dir = transform_dir  # type: ignore[assignment]
 
     query_dict: dict | None = None
     query_str = query or settings.query

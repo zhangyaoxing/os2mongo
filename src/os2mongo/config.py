@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     batch_size: int = 1000
     scroll_time: str = "5m"
     transform_script: Path | None = None
+    transform_dir: Path | None = Path("transformers")
     drop_existing: bool = False
     query: str | None = None
 
