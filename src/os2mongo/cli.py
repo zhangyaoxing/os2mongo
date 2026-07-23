@@ -5,9 +5,12 @@ import logging
 import sys
 
 import click
+from dotenv import load_dotenv
 
 from .config import Settings
 from .engine import MigrationEngine
+
+load_dotenv()
 
 logging.basicConfig(
     level=logging.INFO,

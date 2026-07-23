@@ -31,9 +31,7 @@ class MigrationEngine:
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         if not hasattr(module, "transform"):
-            raise AttributeError(
-                f"Transform script must define a 'transform' function: {path}"
-            )
+            raise AttributeError(f"Transform script must define a 'transform' function: {path}")
         return module.transform
 
     def _load_transforms(self) -> None:
@@ -47,9 +45,7 @@ class MigrationEngine:
             dir_path = self._settings.transform_dir
             if dir_path.is_dir():
                 for py_file in sorted(dir_path.glob("*.py")):
-                    self._transforms.append(
-                        self._load_module_transform(str(py_file))
-                    )
+                    self._transforms.append(self._load_module_transform(str(py_file)))
 
     def _apply_transforms(self, doc: dict[str, Any]) -> dict[str, Any]:
         for t in self._transforms:
@@ -101,7 +97,7 @@ class MigrationEngine:
             batch.append(doc)
             doc_count += 1
 
-            if doc_count % 10 == 0:
+            if doc_count % 100 == 0:
                 logger.info("Processed %d docs so far", doc_count)
 
             if len(batch) >= self._settings.batch_size:
@@ -114,7 +110,10 @@ class MigrationEngine:
                     rate = inserted / elapsed if elapsed > 0 else 0
                     logger.info(
                         "Migrated %d/%d docs (%.0f docs/s, %d errors)",
-                        inserted, total, rate, errors,
+                        inserted,
+                        total,
+                        rate,
+                        errors,
                     )
                     last_report = now
 
@@ -125,7 +124,11 @@ class MigrationEngine:
         rate = inserted / elapsed if elapsed > 0 else 0
         logger.info(
             "Migration finished: %d/%d docs in %.1fs (%.0f docs/s, %d errors)",
-            inserted, total, elapsed, rate, errors,
+            inserted,
+            total,
+            elapsed,
+            rate,
+            errors,
         )
 
         return {"total": total, "inserted": inserted, "errors": errors}
