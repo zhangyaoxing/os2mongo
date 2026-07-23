@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import sys
 
 import click
 from dotenv import load_dotenv
 
 from .config import Settings
+from .embedder import Embedder
 from .engine import MigrationEngine
 
 load_dotenv()
@@ -114,6 +116,26 @@ def check() -> None:
         click.echo(f"  {symbol} {service}")
     if not all(status.values()):
         sys.exit(1)
+
+
+@main.command()
+@click.argument("collection")
+def embed(collection: str) -> None:
+    """Compute embeddings for documents in a MongoDB collection."""
+    settings = Settings()
+    api_key = os.environ.get("OS2MONGO_EMBEDDING_API_KEY", "")
+    if not api_key:
+        click.echo("Error: OS2MONGO_EMBEDDING_API_KEY is not set.", err=True)
+        sys.exit(1)
+
+    embedder = Embedder(settings.mongodb_uri, settings.mongodb_database, api_key)
+    click.echo(f"Embedding documents in '{collection}' ...")
+    result = embedder.embed_collection(collection)
+    click.echo(
+        f"Done. Processed: {result['processed']}, "
+        f"Skipped: {result['skipped']}, "
+        f"Errors: {result['errors']}"
+    )
 
 
 if __name__ == "__main__":

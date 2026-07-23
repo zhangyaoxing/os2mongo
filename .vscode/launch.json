@@ -35,6 +35,23 @@
             "env": {
                 "PYTHONUNBUFFERED": "1"
             }
+        },
+        {
+            "name": "os2mongo embed",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "${workspaceFolder}/.venv/bin/python",
+            "module": "os2mongo.cli",
+            "args": [
+                "embed",
+                "gand_1"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "env": {
+                "PYTHONUNBUFFERED": "1"
+            }
         }
     ]
 }
