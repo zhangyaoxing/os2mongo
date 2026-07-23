@@ -95,63 +95,9 @@ class TestMigrationEngine:
             result = engine.migrate("test_index")
             assert result["inserted"] == 1
 
-    def test_build_date_query_full_range(self, settings: Settings) -> None:
-        settings.date_field = "upload_date"
-        settings.date_range = "2024-01-01,2024-12-31"
-        engine = MigrationEngine(settings)
-        result = engine._build_date_query()
-        assert result == {"range": {"upload_date": {"gte": "2024-01-01", "lte": "2024-12-31"}}}
-
-    def test_build_date_query_gte_only(self, settings: Settings) -> None:
-        settings.date_field = "upload_date"
-        settings.date_range = "2024-01-01,"
-        engine = MigrationEngine(settings)
-        result = engine._build_date_query()
-        assert result == {"range": {"upload_date": {"gte": "2024-01-01"}}}
-
-    def test_build_date_query_lte_only(self, settings: Settings) -> None:
-        settings.date_field = "upload_date"
-        settings.date_range = ",2024-12-31"
-        engine = MigrationEngine(settings)
-        result = engine._build_date_query()
-        assert result == {"range": {"upload_date": {"lte": "2024-12-31"}}}
-
-    def test_build_date_query_no_field(self, settings: Settings) -> None:
-        settings.date_range = "2024-01-01,2024-12-31"
-        engine = MigrationEngine(settings)
-        assert engine._build_date_query() is None
-
-    def test_build_date_query_no_range(self, settings: Settings) -> None:
-        settings.date_field = "upload_date"
-        engine = MigrationEngine(settings)
-        assert engine._build_date_query() is None
-
-    def test_merge_queries_both(self, settings: Settings) -> None:
-        engine = MigrationEngine(settings)
-        base = {"match": {"status": "active"}}
-        extra = {"range": {"upload_date": {"gte": "2024-01-01"}}}
-        result = engine._merge_queries(base, extra)
-        assert result == {"bool": {"must": [base, extra]}}
-
-    def test_merge_queries_base_only(self, settings: Settings) -> None:
-        engine = MigrationEngine(settings)
-        base = {"match": {"status": "active"}}
-        assert engine._merge_queries(base, None) == base
-
-    def test_merge_queries_extra_only(self, settings: Settings) -> None:
-        engine = MigrationEngine(settings)
-        extra = {"range": {"upload_date": {"gte": "2024-01-01"}}}
-        assert engine._merge_queries(None, extra) == extra
-
-    def test_merge_queries_both_none(self, settings: Settings) -> None:
-        engine = MigrationEngine(settings)
-        assert engine._merge_queries(None, None) is None
-
-    def test_migrate_passes_date_query(self, settings: Settings) -> None:
-        settings.date_field = "upload_date"
-        settings.date_range = "2024-01-01,2024-12-31"
+    def test_migrate_passes_query(self, settings: Settings) -> None:
         docs = [{"_id": 1}]
-        expected = {"range": {"upload_date": {"gte": "2024-01-01", "lte": "2024-12-31"}}}
+        query = {"match": {"status": "active"}}
 
         with (
             patch("os2mongo.engine.OpenSearchClient.get_index_count", return_value=1) as mock_count,
@@ -163,6 +109,6 @@ class TestMigrationEngine:
             patch("os2mongo.engine.MongoWriter.get_collection", return_value=MagicMock()),
         ):
             engine = MigrationEngine(settings)
-            engine.migrate("test_index")
-            mock_count.assert_called_once_with("test_index", query=expected)
-            mock_scan.assert_called_once_with("test_index", query=expected)
+            engine.migrate("test_index", query=query)
+            mock_count.assert_called_once_with("test_index", query=query)
+            mock_scan.assert_called_once_with("test_index", query=query)

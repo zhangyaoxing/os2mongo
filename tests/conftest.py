@@ -23,6 +23,4 @@ def settings() -> Settings:
         mongodb_uri="mongodb://localhost:27017",
         mongodb_database="test_os2mongo",
         batch_size=10,
-        date_field=None,
-        date_range=None,
     )

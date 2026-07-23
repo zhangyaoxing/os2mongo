@@ -37,44 +37,6 @@ class MigrationEngine:
             "mongodb": self._mongo.ping(),
         }
 
-    def _build_date_query(self) -> dict[str, Any] | None:
-        """Parse date_field and date_range into an OpenSearch range query.
-
-        date_range format: ``"gte,lte"`` — either side can be empty.
-        Example: ``"2024-01-01,2024-12-31"``, ``"2024-01-01,"``, ``",2024-12-31"``.
-        """
-        if not self._settings.date_field or not self._settings.date_range:
-            return None
-
-        parts = self._settings.date_range.split(",", 1)
-        if len(parts) != 2:
-            return None
-
-        gte, lte = parts[0].strip(), parts[1].strip()
-        range_body: dict[str, Any] = {}
-        if gte:
-            range_body["gte"] = gte
-        if lte:
-            range_body["lte"] = lte
-
-        if not range_body:
-            return None
-
-        return {"range": {self._settings.date_field: range_body}}
-
-    @staticmethod
-    def _merge_queries(
-        base: dict[str, Any] | None, extra: dict[str, Any] | None
-    ) -> dict[str, Any] | None:
-        """Merge two OpenSearch query dicts with a bool must clause."""
-        if not base and not extra:
-            return None
-        if not base:
-            return extra
-        if not extra:
-            return base
-        return {"bool": {"must": [base, extra]}}
-
     def migrate(
         self,
         source_index: str,
@@ -90,9 +52,7 @@ class MigrationEngine:
         if self._settings.drop_existing:
             self._mongo.drop_collection(target)
 
-        merged_query = self._merge_queries(query, self._build_date_query())
-
-        total = self._os.get_index_count(source_index, query=merged_query)
+        total = self._os.get_index_count(source_index, query=query)
         if total == 0:
             return {"total": 0, "inserted": 0, "errors": 0}
 
@@ -101,7 +61,7 @@ class MigrationEngine:
         batch: list[dict[str, Any]] = []
         collection = self._mongo.get_collection(target)
 
-        for doc in self._os.scan_documents(source_index, query=merged_query):
+        for doc in self._os.scan_documents(source_index, query=query):
             if self._transform:
                 try:
                     doc = self._transform(doc)

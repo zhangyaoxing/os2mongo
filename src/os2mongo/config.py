@@ -29,8 +29,6 @@ class Settings(BaseSettings):
     scroll_time: str = "5m"
     transform_script: Path | None = None
     drop_existing: bool = False
-    date_field: str | None = None
-    date_range: str | None = None
 
     @property
     def opensearch_url(self) -> str:
