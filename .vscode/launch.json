@@ -7,7 +7,9 @@
             "request": "launch",
             "python": "${workspaceFolder}/.venv/bin/python",
             "module": "os2mongo.cli",
-            "args": ["check"],
+            "args": [
+                "check"
+            ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "envFile": "${workspaceFolder}/.env",
@@ -21,7 +23,14 @@
             "request": "launch",
             "python": "${workspaceFolder}/.venv/bin/python",
             "module": "os2mongo.cli",
-            "args": ["migrate", "gand_1", "-t", "gand_1", "-q", "{\"range\": {\"upload_date.keyword\": {\"gte\": \"07-04-2026\", \"lte\": \"07-05-2026\"}}}"],
+            "args": [
+                "migrate",
+                "gand_1",
+                "-t",
+                "gand_1",
+                "-q",
+                "{\"range\": {\"upload_date.keyword\": {\"gte\": \"07-04-2026\", \"lte\": \"07-05-2026\"}}}",
+            ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "envFile": "${workspaceFolder}/.env",
