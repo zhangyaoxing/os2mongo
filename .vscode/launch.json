@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "os2mongo check",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "os2mongo.cli",
+            "args": ["check"],
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "name": "os2mongo migrate",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "os2mongo.cli",
+            "args": ["migrate", "PLACEHOLDER_INDEX"],
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
