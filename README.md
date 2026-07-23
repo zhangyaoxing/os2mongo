@@ -31,6 +31,7 @@ All settings are loaded from environment variables with the `OS2MONGO_` prefix, 
 | `OS2MONGO_QUERY`                   | —                           | Default query in OpenSearch DSL (overridden by `-q`)   |
 | `OS2MONGO_TRANSFORM_SCRIPT`        | —                           | Path to a single Python transform script               |
 | `OS2MONGO_TRANSFORM_DIR`           | `transformers`              | Directory of transform scripts (loaded alphabetically) |
+| `OS2MONGO_EMBEDDING_API_KEY`       | —                           | API key for MongoDB AI Embedding API                  |
 
 ## Usage
 

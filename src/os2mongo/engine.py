@@ -84,6 +84,7 @@ class MigrationEngine:
 
         inserted = 0
         errors = 0
+        doc_count = 0
         batch: list[dict[str, Any]] = []
         collection = self._mongo.get_collection(target)
         start_time = time.monotonic()
@@ -98,6 +99,10 @@ class MigrationEngine:
                     continue
 
             batch.append(doc)
+            doc_count += 1
+
+            if doc_count % 10 == 0:
+                logger.info("Processed %d docs so far", doc_count)
 
             if len(batch) >= self._settings.batch_size:
                 inserted += self._mongo.bulk_insert(collection, batch)

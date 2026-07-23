@@ -9,7 +9,10 @@ class Settings(BaseSettings):
     """Configuration for os2mongo, loaded from environment variables or .env file."""
 
     model_config = SettingsConfigDict(
-        env_prefix="OS2MONGO_", env_file=".env", env_file_encoding="utf-8"
+        env_prefix="OS2MONGO_",
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
     )
 
     # OpenSearch
