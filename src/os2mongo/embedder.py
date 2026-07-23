@@ -5,7 +5,7 @@ import os
 import queue
 import threading
 import time
-from typing import Any
+from typing import Any, cast
 
 import requests
 from pymongo import MongoClient
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 _EMBEDDING_API_URL = "https://ai.mongodb.com/v1/embeddings"
 _EMBEDDING_MODEL = "voyage-4-large"
-_SENTINEL = None
+_SENTINEL = object()
 
 
 def _num_workers() -> int:
@@ -56,7 +56,7 @@ class Embedder:
         """
         coll = self._db[collection]
         workers_count = _num_workers()
-        task_queue: queue.Queue[tuple[str, str] | None] = queue.Queue(maxsize=workers_count * 2)
+        task_queue: queue.Queue[tuple[str, str] | object] = queue.Queue(maxsize=workers_count * 2)
         lock = threading.Lock()
         stats: dict[str, int] = {"processed": 0, "skipped": 0, "errors": 0}
         start_time = time.monotonic()
@@ -71,7 +71,7 @@ class Embedder:
                     task_queue.task_done()
                     return
 
-                doc_id, content = item
+                doc_id, content = cast(tuple[str, str], item)
                 try:
                     if not content.strip():
                         with lock:
