@@ -115,3 +115,15 @@ Set a default query in `.env` (no CLI `-q` needed):
 ```env
 OS2MONGO_QUERY={"range": {"upload_date.keyword": {"gte": "07-04-2026", "lte": "07-05-2026"}}}
 ```
+
+### Compute embeddings
+
+Generate embeddings for documents that have `content` but no `embedding` field:
+
+```bash
+os2mongo embed my-collection
+```
+
+Requires `OS2MONGO_EMBEDDING_API_KEY` set in `.env`. Uses the Voyage AI API
+(`voyage-4-large` model) with multiple concurrent workers (default 4, controlled by
+`OS2MONGO_EMBED_WORKERS`).

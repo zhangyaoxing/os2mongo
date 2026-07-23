@@ -56,9 +56,7 @@ class Embedder:
         """
         coll = self._db[collection]
         workers_count = _num_workers()
-        task_queue: queue.Queue[tuple[str, str] | None] = queue.Queue(
-            maxsize=workers_count * 2
-        )
+        task_queue: queue.Queue[tuple[str, str] | None] = queue.Queue(maxsize=workers_count * 2)
         lock = threading.Lock()
         stats: dict[str, int] = {"processed": 0, "skipped": 0, "errors": 0}
         start_time = time.monotonic()
@@ -69,9 +67,7 @@ class Embedder:
                 item = task_queue.get()
                 if item is _SENTINEL:
                     if local_count:
-                        logger.info(
-                            "[worker %d] processed %d docs", worker_id, local_count
-                        )
+                        logger.info("[worker %d] processed %d docs", worker_id, local_count)
                     task_queue.task_done()
                     return
 
@@ -117,8 +113,7 @@ class Embedder:
 
         # Start consumers
         workers = [
-            threading.Thread(target=consumer, args=(i,), daemon=True)
-            for i in range(workers_count)
+            threading.Thread(target=consumer, args=(i,), daemon=True) for i in range(workers_count)
         ]
         for w in workers:
             w.start()
@@ -145,7 +140,11 @@ class Embedder:
         rate = stats["processed"] / elapsed if elapsed > 0 else 0
         logger.info(
             "Embedding finished: %d docs in %.1fs (%.1f docs/s, %d skipped, %d errors)",
-            stats["processed"], elapsed, rate, stats["skipped"], stats["errors"],
+            stats["processed"],
+            elapsed,
+            rate,
+            stats["skipped"],
+            stats["errors"],
         )
 
         return dict(stats)
