@@ -94,3 +94,7 @@ os2mongo migrate my-index -q '{"bool": {"must": [{"range": {"upload_date.keyword
 ```
 
 Set a default query in `.env` (no CLI `-q` needed):
+
+```env
+OS2MONGO_QUERY={"range": {"upload_date.keyword": {"gte": "07-04-2026", "lte": "07-05-2026"}}}
+```
