@@ -26,7 +26,10 @@ class OpenSearchClient:
         self._settings = settings
 
     def ping(self) -> bool:
-        return self._client.ping()
+        try:
+            return self._client.ping()
+        except Exception:
+            return False
 
     def get_index_count(self, index: str) -> int:
         return self._client.count(index=index)["count"]

@@ -2,19 +2,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "os2mongo check",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "os2mongo.cli",
-            "args": ["check"],
-            "envFile": "${workspaceFolder}/.env"
-        },
-        {
             "name": "os2mongo migrate",
             "type": "debugpy",
             "request": "launch",
+            "python": "${workspaceFolder}/.venv/bin/python",
             "module": "os2mongo.cli",
-            "args": ["migrate", "PLACEHOLDER_INDEX"],
+            "args": ["migrate", "gand_1"],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
             "envFile": "${workspaceFolder}/.env"
         }
     ]
