@@ -1,0 +1,15 @@
+"""Example transform script.
+
+Copy this file to a ``.py`` extension to enable it (e.g. ``cp _example.py.example drop_embeddings.py``).
+
+Each script must define a ``transform(doc)`` function that receives a document dict
+and returns the (possibly modified) dict.
+"""
+
+from bson import ObjectId
+
+
+def transform(doc: dict) -> dict:
+    doc["_id"] = ObjectId()
+    doc.pop("embeddings", None)
+    return doc
