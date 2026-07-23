@@ -56,9 +56,10 @@ def migrate(
         settings.transform_script = transform  # type: ignore[assignment]
 
     query_dict: dict | None = None
-    if query:
+    query_str = query or settings.query
+    if query_str:
         try:
-            query_dict = json.loads(query)
+            query_dict = json.loads(query_str)
         except json.JSONDecodeError as e:
             click.echo(f"Error: invalid JSON query: {e}", err=True)
             sys.exit(1)

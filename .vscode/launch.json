@@ -29,9 +29,7 @@
                 "-t",
                 "gand_1",
                 "--transform",
-                "transformers/standard.py",
-                "-q",
-                "{\"range\": {\"upload_date.keyword\": {\"gte\": \"07-04-2026\", \"lte\": \"07-05-2026\"}}}",
+                "transformers/standard.py"
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",

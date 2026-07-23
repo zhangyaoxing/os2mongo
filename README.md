@@ -25,6 +25,7 @@ All settings are loaded from environment variables with the `OS2MONGO_` prefix, 
 | `OS2MONGO_BATCH_SIZE`              | `1000`                      | Documents per bulk insert batch                            |
 | `OS2MONGO_SCROLL_TIME`             | `5m`                        | OpenSearch scroll keep-alive                               |
 | `OS2MONGO_DROP_EXISTING`           | `false`                     | Drop target collection before migration |
+| `OS2MONGO_QUERY`                   | —                           | Default query in OpenSearch DSL (overridden by `-q`) |
 
 ## Usage
 
@@ -78,4 +79,22 @@ def transform(doc):
     doc["_id"] = doc.pop("id")
     doc["migrated_at"] = "2026-07-23"
     return doc
+```
+
+Filter by date range:
+
+```bash
+os2mongo migrate my-index -q '{"range": {"upload_date.keyword": {"gte": "07-04-2026", "lte": "07-05-2026"}}}'
+```
+
+Combine filters with `bool`:
+
+```bash
+os2mongo migrate my-index -q '{"bool": {"must": [{"range": {"upload_date.keyword": {"gte": "07-04-2026"}}}, {"match": {"status": "active"}}]}}'
+```
+
+Set a default query in `.env` (no CLI `-q` needed):
+
+```env
+OS2MONGO_QUERY={"range": {"upload_date.keyword": {"gte": "07-04-2026", "lte": "07-05-2026"}}}
 ```
