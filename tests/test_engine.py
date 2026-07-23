@@ -151,9 +151,10 @@ class TestMigrationEngine:
         settings.date_field = "upload_date"
         settings.date_range = "2024-01-01,2024-12-31"
         docs = [{"_id": 1}]
+        expected = {"range": {"upload_date": {"gte": "2024-01-01", "lte": "2024-12-31"}}}
 
         with (
-            patch("os2mongo.engine.OpenSearchClient.get_index_count", return_value=1),
+            patch("os2mongo.engine.OpenSearchClient.get_index_count", return_value=1) as mock_count,
             patch(
                 "os2mongo.engine.OpenSearchClient.scan_documents",
                 return_value=iter(docs),
@@ -163,5 +164,5 @@ class TestMigrationEngine:
         ):
             engine = MigrationEngine(settings)
             engine.migrate("test_index")
-            expected = {"range": {"upload_date": {"gte": "2024-01-01", "lte": "2024-12-31"}}}
+            mock_count.assert_called_once_with("test_index", query=expected)
             mock_scan.assert_called_once_with("test_index", query=expected)

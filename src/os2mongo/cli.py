@@ -110,3 +110,7 @@ def check() -> None:
         click.echo(f"  {symbol} {service}")
     if not all(status.values()):
         sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

@@ -31,8 +31,13 @@ class OpenSearchClient:
         except Exception:
             return False
 
-    def get_index_count(self, index: str) -> int:
-        return self._client.count(index=index)["count"]
+    def get_index_count(
+        self, index: str, query: dict[str, Any] | None = None
+    ) -> int:
+        body: dict[str, Any] = {}
+        if query:
+            body["query"] = query
+        return self._client.count(index=index, body=body)["count"]
 
     def scan_documents(
         self, index: str, query: dict[str, Any] | None = None

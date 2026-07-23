@@ -92,7 +92,7 @@ class MigrationEngine:
 
         merged_query = self._merge_queries(query, self._build_date_query())
 
-        total = self._os.get_index_count(source_index)
+        total = self._os.get_index_count(source_index, query=merged_query)
         if total == 0:
             return {"total": 0, "inserted": 0, "errors": 0}
 

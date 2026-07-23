@@ -17,6 +17,7 @@ def _mock_pymongo() -> None:
 @pytest.fixture
 def settings() -> Settings:
     return Settings(
+        _env_file=None,  # type: ignore[call-arg]
         opensearch_host="localhost",
         opensearch_port=9200,
         mongodb_uri="mongodb://localhost:27017",
