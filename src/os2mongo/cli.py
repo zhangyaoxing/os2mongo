@@ -41,12 +41,24 @@ def main() -> None:
     type=click.Path(exists=True),
     help="Path to a Python transform script.",
 )
+@click.option(
+    "--date-field",
+    default=None,
+    help="Field name for date-range filtering.",
+)
+@click.option(
+    "--date-range",
+    default=None,
+    help='Date range as "gte,lte" (e.g. "2024-01-01,2024-12-31").',
+)
 def migrate(
     source_index: str,
     target_collection: str | None,
     query: str | None,
     drop_existing: bool | None,
     transform: str | None,
+    date_field: str | None,
+    date_range: str | None,
 ) -> None:
     """Migrate documents from an OpenSearch index to a MongoDB collection."""
     settings = Settings()
@@ -54,6 +66,10 @@ def migrate(
         settings.drop_existing = drop_existing
     if transform:
         settings.transform_script = transform  # type: ignore[assignment]
+    if date_field:
+        settings.date_field = date_field
+    if date_range:
+        settings.date_range = date_range
 
     query_dict: dict | None = None
     if query:
